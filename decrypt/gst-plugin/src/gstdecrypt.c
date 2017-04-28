@@ -61,6 +61,7 @@
 #endif
 
 #include <gst/gst.h>
+#include <stdint.h>
 
 #include "gstdecrypt.h"
 #include "speck.h"
@@ -242,16 +243,24 @@ gst_decrypt_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
     GstMapInfo map;
     if (gst_buffer_map(buf, &map, GST_MAP_WRITE)) {
       guint8 *data = map.data;
+      guint8 *after = data;
       uint32_t *point = (uint32_t *)data;
+      // g_print("before decrypt buf num = %d size = %d\n", buf_num, map.size);
+      // int k;
+      // g_print("Data is :");
+      // for (k = 0; k < 10; k++) {
+      //   g_print(" 0x%02x", *data);
+      //   data++;
+      // }
+      // g_print("\n");
 
       int groups;
       int rounds;
       KEYTYPE initKey[] = {0x12457863, 0x73194682, 0x97436155};
       KEYTYPE keys[26] = {0};
       key_schedule(initKey, keys);
-      groups = buf_num / 4;
+      groups = map.size / 4;
       int flag = 1;
-      // rounds = groups % 2 == 0 ? (groups / 2) : (groups / 2 + 1);
       if (groups % 2 == 0) {
         rounds = groups / 2;
       } else {
@@ -281,6 +290,14 @@ gst_decrypt_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
           *tail = pt[1];
         }
       }
+      // g_print("after decrypt buf num = %d size = %d\n", buf_num, map.size);
+      // int j;
+      // g_print("Data is :");
+      // for (j = 0; j < 10; j++) {
+      //   g_print(" 0x%02x", *after);
+      //   after++;
+      // }
+      // g_print("\n");
       gst_buffer_unmap(buf, &map);
     }
   }

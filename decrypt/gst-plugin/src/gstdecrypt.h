@@ -47,8 +47,15 @@
 #define __GST_DECRYPT_H__
 
 #include <gst/gst.h>
+#include <stdint.h>
 
 G_BEGIN_DECLS
+
+#define ROUNDS 26
+#define KEYLENGTH 3
+#define KEYTYPE uint32_t
+#define DATATYPE uint32_t
+
 
 /* #defines don't like whitespacey bits */
 #define GST_TYPE_DECRYPT \
@@ -82,5 +89,10 @@ struct _GstdecryptClass
 GType gst_decrypt_get_type (void);
 
 G_END_DECLS
+
+
+void key_schedule(KEYTYPE const iv[static KEYLENGTH], KEYTYPE keys[static ROUNDS]);
+void encrypt(DATATYPE const pt[static 2], DATATYPE ct[static 2], KEYTYPE const keys[static ROUNDS]);
+void decrypt(DATATYPE const ct[static 2], DATATYPE pt[static 2], KEYTYPE const keys[static ROUNDS]);
 
 #endif /* __GST_DECRYPT_H__ */

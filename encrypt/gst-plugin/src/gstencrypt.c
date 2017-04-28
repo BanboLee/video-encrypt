@@ -235,29 +235,28 @@ gst_encrypt_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
   filter = GST_ENCRYPT (parent);
 
   if (filter->silent == FALSE) {
-    gint buf_size;
-    buf_size = gst_buffer_get_size(buf);
     static gint buf_num = 0;
     buf_num ++;
     GstMapInfo map;
     if (gst_buffer_map(buf, &map, GST_MAP_WRITE)) {
       guint8 *data = map.data;
+      data = data + 45;
       uint32_t *point = (uint32_t *)data;
-
       int groups;
       int rounds;
+      int flag = 1;
       KEYTYPE initKey[] = {0x12457863, 0x73194682, 0x97436155};
       KEYTYPE keys[26] = {0};
       key_schedule(initKey, keys);
-      groups = buf_num / 4;
-      int flag = 1;
-      // rounds = groups % 2 == 0 ? (groups / 2) : (groups / 2 + 1);
+
+      groups = (map.size - 45) / 4;
       if (groups % 2 == 0) {
         rounds = groups / 2;
       } else {
         rounds = groups / 2 + 1;
         flag = 0;
       }
+
       int i;
       for (i = 0; i < rounds; i++) {
         if(flag == 0 && i == rounds - 1){
@@ -281,6 +280,7 @@ gst_encrypt_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
           *tail = pt[1];
         }
       }
+
       gst_buffer_unmap(buf, &map);
     }
   }

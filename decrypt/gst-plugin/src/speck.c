@@ -16,11 +16,10 @@ void key_schedule(KEYTYPE const k[static KEYLENGTH], KEYTYPE keys[static ROUNDS]
     keys[0] = k1;
     l[0] = k2;
     l[1] = k3;
-
     int i;
     for (i = 0; i < ROUNDS - 1; i++) {
         l[i + KEYLENGTH - 1] = (keys[i] + ROR(l[i], 8)) ^ i;
-        keys[i + 1] = ROL(k[i], 3) ^ l[i + KEYLENGTH - 1];
+        keys[i + 1] = ROL(keys[i], 3) ^ l[i + KEYLENGTH - 1];
     }
 }
 
