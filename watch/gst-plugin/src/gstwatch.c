@@ -61,6 +61,7 @@
 #endif
 
 #include <gst/gst.h>
+#include <stdint.h>
 
 #include "gstwatch.h"
 
@@ -235,16 +236,22 @@ gst_watch_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
   static gint buf_num = 0;
   if (filter->silent == FALSE) {
     buf_num++;
-    g_print("Buffer Num:%d ", buf_num);
+    g_print("No.%d:\n", buf_num);
 
     GstMapInfo map;
     if (gst_buffer_map(buf, &map, GST_MAP_WRITE)) {
       guint8 *point = map.data;
       int i = 0;
-      for(; i < 50 && i < map.size; i++) {
-        g_print(" %02x", *point++);
+      for(; i < map.size; i++) {
+        if (*point == 65 || *point == 67 || *point == 68 || *point == 61) {
+        // if (*point == )
+          uint32_t *p = (uint32_t *)(point - 4);
+          g_print("0x%08x\n", *p); 
+        }
+        point++;
       }
-      g_print("\n");
+      // g_print("\n");
+      // g_print("size of data is : %d  data size is : %d\n", sizeof(guint8), map.size);
       gst_buffer_unmap(buf, &map);
     }
     

@@ -193,7 +193,9 @@ libgstwatch_la-gstwatch.lo: gstwatch.c /usr/include/stdc-predef.h \
  /usr/include/gstreamer-1.0/gst/gsttypefindfactory.h \
  /usr/include/gstreamer-1.0/gst/gstutils.h \
  /usr/include/gstreamer-1.0/gst/gstparse.h \
- /usr/include/gstreamer-1.0/gst/gstcompat.h gstwatch.h
+ /usr/include/gstreamer-1.0/gst/gstcompat.h \
+ /usr/lib/gcc/x86_64-linux-gnu/5/include/stdint.h /usr/include/stdint.h \
+ /usr/include/x86_64-linux-gnu/bits/wchar.h gstwatch.h
 
 /usr/include/stdc-predef.h:
 
@@ -636,5 +638,11 @@ libgstwatch_la-gstwatch.lo: gstwatch.c /usr/include/stdc-predef.h \
 /usr/include/gstreamer-1.0/gst/gstparse.h:
 
 /usr/include/gstreamer-1.0/gst/gstcompat.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/5/include/stdint.h:
+
+/usr/include/stdint.h:
+
+/usr/include/x86_64-linux-gnu/bits/wchar.h:
 
 gstwatch.h:

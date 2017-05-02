@@ -240,47 +240,48 @@ gst_encrypt_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
     GstMapInfo map;
     if (gst_buffer_map(buf, &map, GST_MAP_WRITE)) {
       guint8 *data = map.data;
-      data = data + 45;
-      uint32_t *point = (uint32_t *)data;
-      int groups;
-      int rounds;
-      int flag = 1;
-      KEYTYPE initKey[] = {0x12457863, 0x73194682, 0x97436155};
-      KEYTYPE keys[26] = {0};
-      key_schedule(initKey, keys);
+      if (data[9] == 0x41) {
+        data = data + 10;
+        uint32_t *point = (uint32_t *)data;
+        int groups;
+        int rounds;
+        int flag = 1;
+        KEYTYPE initKey[] = {0x12457863, 0x73194682, 0x97436155};
+        KEYTYPE keys[26] = {0};
+        key_schedule(initKey, keys);
 
-      groups = (map.size - 45) / 4;
-      if (groups % 2 == 0) {
-        rounds = groups / 2;
-      } else {
-        rounds = groups / 2 + 1;
-        flag = 0;
-      }
-
-      int i;
-      for (i = 0; i < rounds; i++) {
-        if(flag == 0 && i == rounds - 1){
-          DATATYPE pt[2];
-          pt[0] = *point;
-          pt[1] = 0x28490022;
-          encrypt(pt, pt, keys);
-          *point = pt[0];
+        groups = (map.size - 10) / 4;
+        if (groups % 2 == 0) {
+          rounds = groups / 2;
         } else {
-          uint32_t *head;
-          uint32_t *tail;
-          DATATYPE pt[2];
-          head = point;
-          pt[0] = *head;
-          point++;
-          tail = point;
-          pt[1] = *tail;
-          point++;
-          encrypt(pt, pt, keys);
-          *head = pt[0];
-          *tail = pt[1];
+          rounds = groups / 2 + 1;
+          flag = 0;
         }
-      }
 
+        int i;
+        for (i = 0; i < rounds; i++) {
+          if(flag == 0 && i == rounds - 1){
+            DATATYPE pt[2];
+            pt[0] = *point;
+            pt[1] = 0x28490022;
+            encrypt(pt, pt, keys);
+            *point = pt[0];
+          } else {
+            uint32_t *head;
+            uint32_t *tail;
+            DATATYPE pt[2];
+            head = point;
+            pt[0] = *head;
+            point++;
+            tail = point;
+            pt[1] = *tail;
+            point++;
+            encrypt(pt, pt, keys);
+            *head = pt[0];
+            *tail = pt[1];
+          }
+        }  
+      }
       gst_buffer_unmap(buf, &map);
     }
   }
