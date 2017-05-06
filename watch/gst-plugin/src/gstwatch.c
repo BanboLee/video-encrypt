@@ -236,27 +236,46 @@ gst_watch_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
   static gint buf_num = 0;
   if (filter->silent == FALSE) {
     buf_num++;
-    g_print("No.%d:\n", buf_num);
-
     GstMapInfo map;
-    if (gst_buffer_map(buf, &map, GST_MAP_WRITE)) {
-      guint8 *point = map.data;
-      int i = 0;
-      for(; i < map.size; i++) {
-        if (*point == 65 || *point == 67 || *point == 68 || *point == 61) {
-        // if (*point == )
-          uint32_t *p = (uint32_t *)(point - 4);
-          g_print("0x%08x\n", *p); 
+    /* just push out the incoming buffer without touching it */
+    if(gst_buffer_map(buf,&map,GST_MAP_WRITE)){
+      guint8 *out = map.data;
+      gint size = map.size;
+      // g_print("data size : %d \n",size);
+      // for(int i=0;i<size;i++){
+      //   if(i%16 == 0){
+      //     g_print("\n");
+      //     g_print("(0x%08x)",out+i);
+      //   }
+      //   g_print(" %02x",out[i]);
+      // }
+      if(out[10]==0x67) {
+        g_print("pps ----------");
+        g_print("\nNo.%d:\n", buf_num);
+        for(int i = 0;i< 80;i++){
+          if(i%16 == 0){
+            g_print("\n");
+            g_print("(0x%08x)",out+i);
+          }
+          g_print(" %02x",out[i]);
         }
-        point++;
+        g_print("\n");
       }
-      // g_print("\n");
-      // g_print("size of data is : %d  data size is : %d\n", sizeof(guint8), map.size);
-      gst_buffer_unmap(buf, &map);
+      if(out[10]==0x65){
+        g_print("IIIII ----------");
+        g_print("\nNo.%d:\n", buf_num);
+        for(int i = 0;i< 80;i++){
+          if(i%16 == 0){
+            g_print("\n");
+            g_print("(0x%08x)",out+i);
+          }
+          g_print(" %02x",out[i]);
+        } 
+        g_print("\n");
+      }
+    gst_buffer_unmap(buf, &map);
     }
-    
   }
-
   /* just push out the incoming buffer without touching it */
   return gst_pad_push (filter->srcpad, buf);
 }

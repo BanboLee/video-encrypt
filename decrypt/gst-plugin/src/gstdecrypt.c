@@ -236,14 +236,12 @@ gst_decrypt_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
   filter = GST_DECRYPT (parent);
 
   if (filter->silent == FALSE) {
-    gint buf_size;
-    buf_size = gst_buffer_get_size(buf);
     static gint buf_num = 0;
     buf_num ++;
     GstMapInfo map;
     if (gst_buffer_map(buf, &map, GST_MAP_WRITE)) {
       guint8 *data = map.data;
-      if (data[9] == 0x41) {
+      if (data[10] == 0x65) {
         data += 11;
         uint32_t *point = (uint32_t *)data;
         int groups;

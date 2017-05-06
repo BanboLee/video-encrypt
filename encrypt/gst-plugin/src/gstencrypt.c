@@ -240,8 +240,8 @@ gst_encrypt_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
     GstMapInfo map;
     if (gst_buffer_map(buf, &map, GST_MAP_WRITE)) {
       guint8 *data = map.data;
-      if (data[9] == 0x41) {
-        data = data + 10;
+      if (data[10] == 0x67 && data[47] == 0x65) {
+        data = data + 48;
         uint32_t *point = (uint32_t *)data;
         int groups;
         int rounds;
@@ -250,7 +250,7 @@ gst_encrypt_chain (GstPad * pad, GstObject * parent, GstBuffer * buf)
         KEYTYPE keys[26] = {0};
         key_schedule(initKey, keys);
 
-        groups = (map.size - 10) / 4;
+        groups = (map.size - 48) / 4;
         if (groups % 2 == 0) {
           rounds = groups / 2;
         } else {
